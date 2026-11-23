@@ -37,7 +37,6 @@ FEATURES:
 import getpass
 import os
 import subprocess
-import sys
 from pathlib import Path
 
 
@@ -114,6 +113,7 @@ BASHRC="$HOME/.bashrc"
 
 PUBLIC_DOMAIN="https://starlit-raft-dispersed.ngrok-free.dev"
 
+
 # ============================================================
 # HELPERS
 # ============================================================
@@ -129,6 +129,7 @@ need() {
     }
 }
 
+
 # ============================================================
 # VERIFY DRIVE
 # ============================================================
@@ -141,6 +142,7 @@ fi
 need curl
 need python3
 need git
+
 
 # ============================================================
 # CREATE PERSISTENT DIRECTORIES
@@ -159,6 +161,7 @@ mkdir -p \
     "$CONFIG_DIR/mcp" \
     "$CONFIG_DIR/auth"
 
+
 # ============================================================
 # SAVE TOKEN IN CURRENT RUNTIME ONLY
 # ============================================================
@@ -173,6 +176,7 @@ umask 077
 printf '%s' "$MCP_GATEWAY_TOKEN" > "$TOKEN_FILE"
 
 chmod 600 "$TOKEN_FILE"
+
 
 # ============================================================
 # MAKE TOKEN AVAILABLE TO COLAB TERMINAL
@@ -191,11 +195,14 @@ token_file = sys.argv[2]
 start = sys.argv[3]
 end = sys.argv[4]
 
-block = f'''{start}
+# FIXED: Use triple-double-quotes here.
+# The enclosing SETUP_SCRIPT uses triple-single-quotes.
+
+block = f"""{start}
 if [ -r "{token_file}" ]; then
     export MCP_GATEWAY_TOKEN="$(cat "{token_file}")"
 fi
-{end}'''
+{end}"""
 
 old = bashrc.read_text() if bashrc.exists() else ""
 
@@ -213,6 +220,7 @@ else:
 bashrc.write_text(updated)
 
 PYTOKEN
+
 
 # ============================================================
 # INSTALL OPENCODE
@@ -252,6 +260,7 @@ grep -qxF 'export PATH="/usr/local/bin:$PATH"' "$HOME/.bashrc" 2>/dev/null || \
 
 "$OPENCODE" --version
 
+
 # ============================================================
 # MIGRATE GLOBAL CONFIGURATION TO GOOGLE DRIVE
 # ============================================================
@@ -278,7 +287,6 @@ fi
 
 ln -s "$CONFIG_DIR" "$LOCAL_CONFIG"
 
-# All global configuration now lives on Google Drive.
 
 # ============================================================
 # DEFAULT AGENTS FILE
@@ -296,6 +304,7 @@ cat > "$CONFIG_DIR/AGENTS.md" <<'EOF'
 EOF
 
 fi
+
 
 # ============================================================
 # CONFIGURE MCP SERVERS
@@ -392,6 +401,7 @@ print("Configured: local-playwright")
 
 PYMCP
 
+
 # ============================================================
 # RESTORE AUTHENTICATION
 # ============================================================
@@ -409,6 +419,7 @@ if [[ -f "$CONFIG_DIR/auth/auth.json" &&
         "$LOCAL_DATA/auth.json"
 
 fi
+
 
 # ============================================================
 # RESTORE FULL SESSIONS
@@ -517,6 +528,7 @@ for file in sorted(folder.glob("*.json")):
         log("RESTORE ERROR " + file.name + ": " + repr(exc))
 
 PYRESTORE
+
 
 # ============================================================
 # FIVE-SECOND SESSION + AUTH BACKUP WORKER
@@ -719,6 +731,7 @@ if __name__ == "__main__":
 
 PYBACKUP
 
+
 # ============================================================
 # RESTART BACKUP WORKER
 # ============================================================
@@ -755,6 +768,7 @@ nohup python3 /content/opencode-session-backup.py \
     2>&1 </dev/null &
 
 echo $! > "$PIDFILE"
+
 
 # ============================================================
 # FINISH
@@ -820,6 +834,7 @@ fi
 exec "$OPENCODE"
 
 '''
+
 
 # ============================================================
 # 4. EXECUTE BOOTSTRAP
